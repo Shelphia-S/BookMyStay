@@ -1,204 +1,79 @@
-import java.util.*;
-
-// -------------------- ADD-ON SERVICE --------------------
-
-class AddOnService {
-    private String name;
+abstract class Room {
+    private String type;
+    private int beds;
     private double price;
 
-    public AddOnService(String name, double price) {
-        this.name = name;
+    public Room(String type, int beds, double price) {
+        this.type = type;
+        this.beds = beds;
         this.price = price;
     }
 
-    public String getName() { return name; }
-    public double getPrice() { return price; }
+    public String getType() {
+        return type;
+    }
 
-    public void display() {
-        System.out.println(name + " (₹" + price + ")");
+    public int getBeds() {
+        return beds;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void displayDetails() {
+        System.out.println("Room Type: " + type);
+        System.out.println("Beds: " + beds);
+        System.out.println("Price per night: ₹" + price);
     }
 }
 
-// -------------------- ADD-ON SERVICE MANAGER --------------------
-
-class AddOnServiceManager {
-    private Map<String, List<AddOnService>> serviceMap = new HashMap<>();
-
-    public void addService(String reservationId, AddOnService service) {
-        serviceMap.putIfAbsent(reservationId, new ArrayList<>());
-        serviceMap.get(reservationId).add(service);
-        System.out.println(service.getName() + " added to Reservation " + reservationId);
-    }
-
-    public List<AddOnService> getServices(String reservationId) {
-        return serviceMap.getOrDefault(reservationId, new ArrayList<>());
-    }
-
-    public double calculateTotalCost(String reservationId) {
-        double total = 0;
-        for (AddOnService service : getServices(reservationId)) {
-            total += service.getPrice();
-        }
-        return total;
-    }
-
-    public void displayServices(String reservationId) {
-        System.out.println("\n=== Add-On Services for " + reservationId + " ===");
-
-        List<AddOnService> services = getServices(reservationId);
-
-        if (services.isEmpty()) {
-            System.out.println("No add-on services selected.");
-            return;
-        }
-
-        for (AddOnService s : services) {
-            s.display();
-        }
-
-        System.out.println("Total Add-On Cost: ₹" + calculateTotalCost(reservationId));
+class SingleRoom extends Room {
+    public SingleRoom() {
+        super("Single Room", 1, 2000);
     }
 }
 
-// -------------------- BOOKING RECORD --------------------
-
-class BookingRecord {
-    private String reservationId;
-    private String guestName;
-    private String roomType;
-
-    public BookingRecord(String reservationId, String guestName, String roomType) {
-        this.reservationId = reservationId;
-        this.guestName = guestName;
-        this.roomType = roomType;
-    }
-
-    public String getReservationId() { return reservationId; }
-
-    public void display() {
-        System.out.println("Reservation ID: " + reservationId +
-                ", Guest: " + guestName +
-                ", Room Type: " + roomType);
+class DoubleRoom extends Room {
+    public DoubleRoom() {
+        super("Double Room", 2, 3500);
     }
 }
 
-// -------------------- BOOKING HISTORY --------------------
-
-class BookingHistory {
-    private List<BookingRecord> history = new ArrayList<>();
-
-    public void addBooking(BookingRecord record) {
-        history.add(record);
-        System.out.println("Booking added to history: " + record.getReservationId());
-    }
-
-    public List<BookingRecord> getAllBookings() {
-        return history;
-    }
-
-    public void displayHistory() {
-        System.out.println("\n=== Booking History ===");
-        if (history.isEmpty()) {
-            System.out.println("No bookings found.");
-            return;
-        }
-
-        for (BookingRecord record : history) {
-            record.display();
-        }
+class SuiteRoom extends Room {
+    public SuiteRoom() {
+        super("Suite Room", 3, 6000);
     }
 }
 
-// -------------------- BOOKING REPORT SERVICE --------------------
-
-class BookingReportService {
-    public void generateReport(BookingHistory history) {
-        System.out.println("\n=== Booking Report ===");
-
-        List<BookingRecord> bookings = history.getAllBookings();
-        System.out.println("Total Confirmed Bookings: " + bookings.size());
-
-        for (BookingRecord record : bookings) {
-            record.display();
-        }
-    }
-}
-
-// -------------------- VALIDATION EXCEPTION --------------------
-
-class ValidationException extends Exception {
-    public ValidationException(String message) {
-        super(message);
-    }
-}
-
-// -------------------- BOOKING VALIDATOR --------------------
-
-class BookingValidator {
-
-    public static void validate(String reservationId, String guestName, String roomType)
-            throws ValidationException {
-
-        if (reservationId == null || reservationId.isEmpty()) {
-            throw new ValidationException("Reservation ID cannot be empty.");
-        }
-
-        if (guestName == null || guestName.length() < 3) {
-            throw new ValidationException("Guest name must be at least 3 characters.");
-        }
-
-        if (!(roomType.equalsIgnoreCase("Single") ||
-              roomType.equalsIgnoreCase("Double") ||
-              roomType.equalsIgnoreCase("Deluxe"))) {
-            throw new ValidationException("Invalid room type selected.");
-        }
-    }
-}
-
-// -------------------- MAIN DEMO --------------------
-
-public class BookMyStayApp {
+public class UseCase2RoomInitialization {
 
     public static void main(String[] args) {
 
-        String res1 = "S101";
-        String res2 = "D205";
+        System.out.println("======================================");
+        System.out.println(" Book My Stay App ");
+        System.out.println(" Version: 2.0 ");
+        System.out.println("======================================");
 
-        AddOnServiceManager manager = new AddOnServiceManager();
+        Room single = new SingleRoom();
+        Room doubleRoom = new DoubleRoom();
+        Room suite = new SuiteRoom();
 
-        AddOnService breakfast = new AddOnService("Breakfast", 300);
-        AddOnService wifi = new AddOnService("Premium WiFi", 200);
-        AddOnService spa = new AddOnService("Spa Access", 1000);
+        int singleAvailability = 5;
+        int doubleAvailability = 3;
+        int suiteAvailability = 2;
 
-        manager.addService(res1, breakfast);
-        manager.addService(res1, wifi);
-        manager.addService(res2, spa);
+        System.out.println("\n--- Room Details ---\n");
 
-        manager.displayServices(res1);
-        manager.displayServices(res2);
+        single.displayDetails();
+        System.out.println("Available: " + singleAvailability + "\n");
 
-        BookingHistory history = new BookingHistory();
-        BookingReportService reportService = new BookingReportService();
+        doubleRoom.displayDetails();
+        System.out.println("Available: " + doubleAvailability + "\n");
 
-        try {
-            // Valid booking
-            BookingValidator.validate(res1, "Arun", "Single");
-            BookingRecord b1 = new BookingRecord(res1, "Arun", "Single");
-            history.addBooking(b1);
+        suite.displayDetails();
+        System.out.println("Available: " + suiteAvailability + "\n");
 
-            // Invalid booking example
-            BookingValidator.validate(res2, "Me", "Luxury"); // Will cause error
-            BookingRecord b2 = new BookingRecord(res2, "Me", "Luxury");
-            history.addBooking(b2);
-
-        } catch (ValidationException e) {
-            System.out.println("Booking Error: " + e.getMessage());
-        }
-
-        // Admin views history & report
-        history.displayHistory();
-        reportService.generateReport(history);
-
-        System.out.println("\nSystem continues running safely after handling errors ✅");
+        System.out.println("Application execution completed.");
     }
 }
