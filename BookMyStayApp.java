@@ -22,6 +22,7 @@ class AddOnService {
 // -------------------- ADD-ON SERVICE MANAGER --------------------
 
 class AddOnServiceManager {
+
     private Map<String, List<AddOnService>> serviceMap = new HashMap<>();
 
     public void addService(String reservationId, AddOnService service) {
@@ -112,45 +113,16 @@ class BookingHistory {
 // -------------------- BOOKING REPORT SERVICE --------------------
 
 class BookingReportService {
+
     public void generateReport(BookingHistory history) {
         System.out.println("\n=== Booking Report ===");
 
         List<BookingRecord> bookings = history.getAllBookings();
+
         System.out.println("Total Confirmed Bookings: " + bookings.size());
 
         for (BookingRecord record : bookings) {
             record.display();
-        }
-    }
-}
-
-// -------------------- VALIDATION EXCEPTION --------------------
-
-class ValidationException extends Exception {
-    public ValidationException(String message) {
-        super(message);
-    }
-}
-
-// -------------------- BOOKING VALIDATOR --------------------
-
-class BookingValidator {
-
-    public static void validate(String reservationId, String guestName, String roomType)
-            throws ValidationException {
-
-        if (reservationId == null || reservationId.isEmpty()) {
-            throw new ValidationException("Reservation ID cannot be empty.");
-        }
-
-        if (guestName == null || guestName.length() < 3) {
-            throw new ValidationException("Guest name must be at least 3 characters.");
-        }
-
-        if (!(roomType.equalsIgnoreCase("Single") ||
-              roomType.equalsIgnoreCase("Double") ||
-              roomType.equalsIgnoreCase("Deluxe"))) {
-            throw new ValidationException("Invalid room type selected.");
         }
     }
 }
@@ -180,25 +152,19 @@ public class BookMyStayApp {
         BookingHistory history = new BookingHistory();
         BookingReportService reportService = new BookingReportService();
 
-        try {
-            // Valid booking
-            BookingValidator.validate(res1, "Arun", "Single");
-            BookingRecord b1 = new BookingRecord(res1, "Arun", "Single");
-            history.addBooking(b1);
+        // Assume bookings confirmed
+        BookingRecord b1 = new BookingRecord(res1, "Arun", "Single Room");
+        BookingRecord b2 = new BookingRecord(res2, "Meena", "Deluxe Room");
 
-            // Invalid booking example
-            BookingValidator.validate(res2, "Me", "Luxury"); // Will cause error
-            BookingRecord b2 = new BookingRecord(res2, "Me", "Luxury");
-            history.addBooking(b2);
+        history.addBooking(b1);
+        history.addBooking(b2);
 
-        } catch (ValidationException e) {
-            System.out.println("Booking Error: " + e.getMessage());
-        }
-
-        // Admin views history & report
+        // Admin views history
         history.displayHistory();
+
+        // Admin generates report
         reportService.generateReport(history);
 
-        System.out.println("\nSystem continues running safely after handling errors ✅");
+        System.out.println("\n(Core booking, inventory, add-ons unchanged ✅)");
     }
 }
